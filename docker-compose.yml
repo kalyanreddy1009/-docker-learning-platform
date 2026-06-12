@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Local Database Service
+  db:
+    image: postgres:15-alpine
+    container_name: dlp-db
+    restart: always
+    environment:
+      POSTGRES_USER: dlp_user
+      POSTGRES_PASSWORD: dlp_password123
+      POSTGRES_DB: dlp_learning_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Backend API Gateway (Skeleton - uncomment when backend is created)
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile.dev
+  #   container_name: dlp-backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=3001
+  #     - DATABASE_URL=postgresql://dlp_user:dlp_password123@db:5432/dlp_learning_db
+  #   depends_on:
+  #     - db
+
+  # Frontend Next.js Client (Skeleton - uncomment when frontend is created)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.dev
+  #   container_name: dlp-frontend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NEXT_PUBLIC_API_URL=http://localhost:3001
+  #   depends_on:
+  #     - backend
+
+  # AI Service Microservice (Skeleton - uncomment when ai-service is created)
+  # ai-service:
+  #   build:
+  #     context: ./ai-service
+  #     dockerfile: Dockerfile.dev
+  #   container_name: dlp-ai-service
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5001:5001"
+  #   environment:
+  #     - PORT=5001
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+volumes:
+  postgres_data:
+    driver: local
