@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Local Database Service
   db:
@@ -14,6 +12,24 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dlp_user -d dlp_learning_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache (Session caching, rate limiting, WebSocket pub/sub)
+  redis:
+    image: redis:7-alpine
+    container_name: dlp-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # Backend API Gateway (Skeleton - uncomment when backend is created)
   # backend:
@@ -29,7 +45,10 @@ services:
   #     - PORT=3001
   #     - DATABASE_URL=postgresql://dlp_user:dlp_password123@db:5432/dlp_learning_db
   #   depends_on:
-  #     - db
+  #     db:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
 
   # Frontend Next.js Client (Skeleton - uncomment when frontend is created)
   # frontend:
