@@ -3,8 +3,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
 import AuthLayout from '@/components/AuthLayout';
+import { apiUrl } from '@/lib/api';
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,6 +14,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +22,7 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/register', {
+      const res = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
@@ -31,7 +34,7 @@ export default function RegisterPage() {
         throw new Error(data.message || 'Registration failed');
       }
       
-      window.location.href = '/login?registered=true';
+      router.push('/login?registered=true');
     } catch (err: any) {
       setError(err.message);
     } finally {

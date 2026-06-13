@@ -66,34 +66,38 @@ export class UsersService {
   }
 
   async markLessonCompleted(userId: string, lessonId: string) {
-    // Check if progress exists
-    let prog = await this.prisma.progress.findUnique({
-      where: { userId_lessonId: { userId, lessonId } },
-    });
-
-    if (!prog || prog.status !== 'COMPLETED') {
-      prog = await this.prisma.progress.upsert({
+    return this.prisma.$transaction(async (tx) => {
+      let prog = await tx.progress.findUnique({
         where: { userId_lessonId: { userId, lessonId } },
-        create: {
-          userId,
-          lessonId,
-          status: 'COMPLETED',
-          completedAt: new Date(),
-        },
-        update: {
-          status: 'COMPLETED',
-          completedAt: new Date(),
-        },
       });
 
-      // Award XP
-      const lesson = await this.prisma.lesson.findUnique({
-        where: { id: lessonId },
-      });
-      if (lesson) {
-        await this.addXp(userId, lesson.xpReward);
+      if (!prog || prog.status !== 'COMPLETED') {
+        prog = await tx.progress.upsert({
+          where: { userId_lessonId: { userId, lessonId } },
+          create: {
+            userId,
+            lessonId,
+            status: 'COMPLETED',
+            completedAt: new Date(),
+          },
+          update: {
+            status: 'COMPLETED',
+            completedAt: new Date(),
+          },
+        });
+
+        const lesson = await tx.lesson.findUnique({
+          where: { id: lessonId },
+        });
+
+        if (lesson) {
+          await tx.profile.update({
+            where: { userId },
+            data: { xp: { increment: lesson.xpReward } },
+          });
+        }
       }
-    }
-    return prog;
+      return prog;
+    });
   }
 }

@@ -9,6 +9,7 @@ import { useParams, useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import dynamic from 'next/dynamic';
+import { apiUrl } from '@/lib/api';
 
 const TerminalComponent = dynamic(() => import('@/components/TerminalComponent'), { 
   ssr: false,
@@ -34,7 +35,7 @@ export default function LessonPage() {
     const fetchLesson = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:3001/api/courses/lesson/${id}`, {
+        const res = await fetch(apiUrl(`/api/courses/lesson/${id}`), {
           headers: token ? { 'Authorization': `Bearer ${token}` } : {},
           cache: 'no-store'
         });
@@ -65,7 +66,7 @@ export default function LessonPage() {
       }
 
       if (lesson.type === 'LAB') {
-        const res = await fetch(`http://localhost:3001/api/courses/lesson/${id}/verify`, {
+        const res = await fetch(apiUrl(`/api/courses/lesson/${id}/verify`), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ export default function LessonPage() {
           alert(data.message || 'Validation failed. Please run all required commands in the terminal first.');
         }
       } else {
-        const res = await fetch(`http://localhost:3001/api/users/me/progress/complete`, {
+        const res = await fetch(apiUrl(`/api/users/me/progress/complete`), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

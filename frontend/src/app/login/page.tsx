@@ -3,14 +3,17 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import AuthLayout from '@/components/AuthLayout';
+import { apiUrl } from '@/lib/api';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +21,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -31,7 +34,7 @@ export default function LoginPage() {
       }
       
       localStorage.setItem('token', data.access_token);
-      window.location.href = '/dashboard';
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
     } finally {

@@ -6,7 +6,6 @@ import {
   UseGuards,
   Req,
   BadRequestException,
-  Body,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -30,7 +29,6 @@ export class CoursesController {
   @Get()
   async findAll() {
     const courses = await this.coursesService.findAll();
-    console.log('findAll returning courses count:', courses.length);
     return courses;
   }
 
@@ -71,9 +69,6 @@ export class CoursesController {
     }>;
     let passed = true;
 
-    console.log('Validation Rules:', rules);
-    console.log('Commands Run:', session.commandsRun);
-
     if (rules && rules.length > 0) {
       for (const rule of rules) {
         if (rule.type === 'command_run') {
@@ -82,7 +77,6 @@ export class CoursesController {
             cmd.includes(rule.command),
           );
           if (!hasRun) {
-            console.log(`Failed rule: missing command '${rule.command}'`);
             passed = false;
             break;
           }

@@ -8,7 +8,6 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { UsersService } from '../users/users.service';
 
 interface SessionState {
   buffer: string;
@@ -21,7 +20,7 @@ const generateId = (len = 12) => Math.random().toString(16).slice(2, 2 + len);
 
 @WebSocketGateway({
   namespace: 'terminal',
-  cors: { origin: '*' },
+  cors: { origin: process.env.CORS_ORIGIN || 'http://localhost:3000' },
 })
 export class TerminalGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -29,7 +28,7 @@ export class TerminalGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   private sessions: Map<string, SessionState> = new Map();
 
-  constructor(private usersService: UsersService) {}
+  constructor() {}
 
   handleConnection(client: Socket) {
     this.sessions.set(client.id, { buffer: '' });
@@ -138,7 +137,7 @@ export class TerminalGateway implements OnGatewayConnection, OnGatewayDisconnect
       ls: () => `app  bin  boot  dev  etc  home  lib  media  mnt  opt  root  run  sbin  srv  sys  tmp  usr  var`,
       pwd: () => `/root`,
       echo: () => args.slice(1).join(' '),
-      clear: () => '\\x1b[2J\\x1b[3J\\x1b[H',
+      clear: () => '\x1b[2J\x1b[3J\x1b[H',
       cat: () => this.handleCat(args),
       whoami: () => `root`,
       hostname: () => `dlp-lab-env`,
@@ -220,8 +219,8 @@ export class TerminalGateway implements OnGatewayConnection, OnGatewayDisconnect
   private handleDockerCompose(args: string[]): string {
     const composeCmd = args[1];
     switch(composeCmd) {
-      case 'up': return `Creating network "app_default" with the default driver\r\nCreating app_db_1    ... \\x1b[32mdone\\x1b[0m\r\nCreating app_web_1   ... \\x1b[32mdone\\x1b[0m\r\nAttaching to app_db_1, app_web_1\r\n\\x1b[36mdb_1   |\\x1b[0m PostgreSQL init process complete; ready for start up.\r\n\\x1b[33mweb_1  |\\x1b[0m Server listening on port 3000\r\n\r\n\\x1b[1;32m[SUCCESS] All services are running.\\x1b[0m`;
-      case 'down': return `Stopping app_web_1  ... \\x1b[32mdone\\x1b[0m\r\nStopping app_db_1   ... \\x1b[32mdone\\x1b[0m\r\nRemoving app_web_1  ... \\x1b[32mdone\\x1b[0m\r\nRemoving app_db_1   ... \\x1b[32mdone\\x1b[0m\r\nRemoving network app_default`;
+      case 'up': return `Creating network "app_default" with the default driver\r\nCreating app_db_1    ... \x1b[32mdone\x1b[0m\r\nCreating app_web_1   ... \x1b[32mdone\x1b[0m\r\nAttaching to app_db_1, app_web_1\r\n\x1b[36mdb_1   |\x1b[0m PostgreSQL init process complete; ready for start up.\r\n\x1b[33mweb_1  |\x1b[0m Server listening on port 3000\r\n\r\n\x1b[1;32m[SUCCESS] All services are running.\x1b[0m`;
+      case 'down': return `Stopping app_web_1  ... \x1b[32mdone\x1b[0m\r\nStopping app_db_1   ... \x1b[32mdone\x1b[0m\r\nRemoving app_web_1  ... \x1b[32mdone\x1b[0m\r\nRemoving app_db_1   ... \x1b[32mdone\x1b[0m\r\nRemoving network app_default`;
       case 'ps': return `     Name               Command          State           Ports\r\n─────────────────────────────────────────────────────────────\r\napp_db_1    docker-entrypoint.sh postgres   Up   5432/tcp\r\napp_web_1   docker-entrypoint.sh node       Up   0.0.0.0:3000->3000/tcp`;
       default: return `Usage: docker-compose [OPTIONS] COMMAND`;
     }
@@ -230,7 +229,7 @@ export class TerminalGateway implements OnGatewayConnection, OnGatewayDisconnect
   private handleKubectl(args: string[]): string {
     const sub = args[1];
     switch(sub) {
-      case 'cluster-info': return `\\x1b[32mKubernetes control plane\\x1b[0m is running at \\x1b[33mhttps://127.0.0.1:6443\\x1b[0m`;
+      case 'cluster-info': return `\x1b[32mKubernetes control plane\x1b[0m is running at \x1b[33mhttps://127.0.0.1:6443\x1b[0m`;
       case 'get':
         const resource = args[2];
         const ns = args.includes('-n') ? args[args.indexOf('-n') + 1] : 'default';
@@ -243,6 +242,15 @@ export class TerminalGateway implements OnGatewayConnection, OnGatewayDisconnect
         return `No resources found in ${ns} namespace.`;
     }
 
-    return `bash: ${main}: command not found`;
+    return `bash: kubectl ${sub}: command not found`;
+  }
+
+  private handleHelm(args: string[]): string {
+    const sub = args[1];
+    switch (sub) {
+      case 'install': return `NAME: ${args[2] || 'my-release'}\r\nLAST DEPLOYED: ${new Date().toString()}\r\nNAMESPACE: default\r\nSTATUS: deployed\r\nREVISION: 1`;
+      case 'list': return `NAME       NAMESPACE  REVISION  UPDATED                                  STATUS    CHART            APP VERSION\r\nmy-release default    1         ${new Date().toISOString()} deployed  my-chart-1.0.0   1.0.0`;
+      default: return `helm: unknown command '${sub}'`;
+    }
   }
 }

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Star, Clock, ChevronRight, Terminal } from 'lucide-react';
 import Link from 'next/link';
+import { apiUrl } from '@/lib/api';
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -15,7 +16,7 @@ export default function CoursesPage() {
       try {
         const token = localStorage.getItem('token');
 
-        const res = await fetch(`http://localhost:3001/api/courses?_t=${Date.now()}`, {
+        const res = await fetch(apiUrl(`/api/courses?_t=${Date.now()}`), {
           headers: token ? {
             'Authorization': `Bearer ${token}`
           } : {},

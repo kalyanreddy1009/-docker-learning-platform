@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PlayCircle, Clock, BookOpen, Star, Terminal, CheckCircle2, TrendingUp, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { apiUrl } from '@/lib/api';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState([
@@ -23,7 +24,7 @@ export default function DashboardPage() {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        const res = await fetch('http://localhost:3001/api/users/me/dashboard', {
+        const res = await fetch(apiUrl('/api/users/me/dashboard'), {
           headers: {
             'Authorization': `Bearer ${token}`
           }

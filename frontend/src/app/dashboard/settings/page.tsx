@@ -18,10 +18,10 @@ export default function SettingsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[
-          { icon: User, title: 'Profile', description: 'Update your name, email, and avatar', color: 'blue' },
-          { icon: Bell, title: 'Notifications', description: 'Configure email and push notifications', color: 'purple' },
-          { icon: Palette, title: 'Appearance', description: 'Switch between light and dark themes', color: 'orange' },
-          { icon: SettingsIcon, title: 'Account', description: 'Manage password and security settings', color: 'green' },
+          { icon: User, title: 'Profile', description: 'Update your name, email, and avatar', colorClass: 'text-blue-500', bgClass: 'bg-blue-500/10', borderClass: 'border-blue-500/20' },
+          { icon: Bell, title: 'Notifications', description: 'Configure email and push notifications', colorClass: 'text-purple-500', bgClass: 'bg-purple-500/10', borderClass: 'border-purple-500/20' },
+          { icon: Palette, title: 'Appearance', description: 'Switch between light and dark themes', colorClass: 'text-orange-500', bgClass: 'bg-orange-500/10', borderClass: 'border-orange-500/20' },
+          { icon: SettingsIcon, title: 'Account', description: 'Manage password and security settings', colorClass: 'text-green-500', bgClass: 'bg-green-500/10', borderClass: 'border-green-500/20' },
         ].map((item, idx) => (
           <motion.div
             key={item.title}
@@ -30,8 +30,8 @@ export default function SettingsPage() {
             transition={{ delay: idx * 0.05 }}
             className="glass-panel rounded-2xl border border-slate-200/50 dark:border-slate-800/50 p-6 hover:border-blue-500/30 transition-colors cursor-pointer group"
           >
-            <div className={`w-12 h-12 bg-${item.color}-500/10 rounded-xl flex items-center justify-center mb-4 border border-${item.color}-500/20 group-hover:scale-110 transition-transform`}>
-              <item.icon className={`w-6 h-6 text-${item.color}-500`} />
+            <div className={`w-12 h-12 ${item.bgClass} rounded-xl flex items-center justify-center mb-4 border ${item.borderClass} group-hover:scale-110 transition-transform`}>
+              <item.icon className={`w-6 h-6 ${item.colorClass}`} />
             </div>
             <h3 className="text-lg font-bold text-foreground mb-1">{item.title}</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400">{item.description}</p>
