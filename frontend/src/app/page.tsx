@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Terminal, Box, Shield, Zap, ChevronRight, Github } from "lucide-react";
+import { Terminal, Box, Shield, Zap, ChevronRight } from "lucide-react";
 
 export default function Home() {
   return (
@@ -75,7 +75,6 @@ export default function Home() {
               <ChevronRight className="w-5 h-5" />
             </Link>
             <Link href="https://github.com" target="_blank" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-slate-800 bg-slate-900/50 hover:bg-slate-800 text-slate-300 font-medium text-lg transition-all hover:scale-105 backdrop-blur-md">
-              <Github className="w-5 h-5" />
               View Source
             </Link>
           </motion.div>
