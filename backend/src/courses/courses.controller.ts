@@ -12,6 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { TerminalGateway } from '../terminal/terminal.gateway';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
+import { Request } from 'express';
 
 interface RequestWithUser extends Request {
   user: { id: string };
